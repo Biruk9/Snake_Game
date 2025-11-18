@@ -1,0 +1,21 @@
+# Compiled object files
+*.o
+*.obj
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+*.log
+*.dSYM/
+*.pdb
+
+# Backup and temporary files
+*~
+*.swp
+*.tmp
+
+# VSCode settings
+.vscode/
