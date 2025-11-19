@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
-
-#define cols 10
-#define rows 10
+#include <time.h>
+#define cols 30
+#define rows 25
+#define foods 50
 
 char board[cols * rows];
 int isGameOver = 0;
@@ -35,8 +36,6 @@ void print_board()
 {
     int x, y;
 
-    Clear_Screen();
-
     for (y = 0; y < rows; y++)
     {
         for (x = 0; x < cols; x++)
@@ -46,19 +45,47 @@ void print_board()
         putchar('\n');
     }
 }
+#define SNAKE_MAX_LEN 256
+struct SnakePart
+{
+    int x, y;
+};
+struct Snake
+{
+    int length;
+    struct SnakePart part[SNAKE_MAX_LEN];
+};
+struct Snake snake;
 
-int snakeX = 5;
-int snakeY = 5;
+struct Food
+{
+    int x, y;
+
+    int consumed;
+};
+
+struct Food food[foods];
 
 void draw_snake()
 {
-    board[snakeY * cols + snakeX] = '@';
+    int i;
+    for (i = snake.length - 1; i > 0; i--)
+    {
+        board[snake.part[i].y * cols + snake.part[i].x] = '*';
+    }
+    board[snake.part[0].y * cols + snake.part[0].x] = '@';
 }
 
 void move_snake(int deltaX, int deltaY)
 {
-    snakeX += deltaX;
-    snakeY += deltaY;
+    int i;
+    for (i = snake.length - 1; i > 0; i--)
+    {
+        snake.part[i] = snake.part[i - 1];
+    }
+
+    snake.part[0].x += deltaX;
+    snake.part[0].y += deltaY;
 }
 void read_Keyboard()
 {
@@ -81,16 +108,95 @@ void read_Keyboard()
         break;
     }
 }
+
+void draw_food()
+{
+    int i;
+    for (i = 0; i < foods; i++)
+    {
+        if (!food[i].consumed)
+        {
+            board[food[i].y * cols + food[i].x] = '+';
+        }
+    }
+}
+
+void setup_food()
+{
+
+    int i;
+    for (i = 0; i < foods; i++)
+    {
+        food[i].x = 1 + rand() % (cols - 2);
+        food[i].y = 1 + rand() % (rows - 2);
+        food[i].consumed = 0;
+    }
+}
+
+void setup_snake()
+{
+    snake.length = 3;
+    snake.part[0].x = 1 + rand() % (cols - 2);
+    snake.part[0].y = 1 + rand() % (rows - 2);
+}
+void game_rules()
+{
+
+    int i;
+    for (i = 0; i < foods; i++)
+    {
+
+        if (!food[i].consumed)
+        {
+            if (food[i].x == snake.part[0].x &&
+                food[i].y == snake.part[0].y)
+            {
+                food[i].consumed = 1;
+                snake.length++;
+            }
+        }
+    }
+
+    if (snake.part[0].x == 0 || snake.part[0].x == cols - 1 || snake.part[0].y == 0 || snake.part[0].y == rows - 1)
+    {
+
+        isGameOver = 1;
+    }
+
+    for (i = 1; i < snake.length; i++)
+    {
+        if (snake.part[0].x == snake.part[i].x && snake.part[0].y == snake.part[i].y)
+        {
+            isGameOver = 1;
+        }
+    }
+}
 int main(int argc, char **a)
 {
+
+    // srand(time(0));
+    snake.length = 3;
+    setup_snake();
+
+    setup_food();
+    food[0];
     while (!isGameOver)
     {
 
         fill_board();
+        draw_food();
         draw_snake();
+        game_rules();
+        Clear_Screen();
+        printf("Score: %d\n", snake.length * 100);
         print_board();
-        read_Keyboard();
+        if (!isGameOver)
+            read_Keyboard();
     }
 
+    printf("GAME OVER,FINAL SCORE: %d\n", snake.length * 100);
+
+    while (1)
+        getch();
     return 0;
 }
