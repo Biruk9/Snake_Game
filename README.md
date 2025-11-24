@@ -24,7 +24,7 @@ R     - Restart Game (from Game Over Menu)
 
 Installation & Compilation:
 1. Clone the repository:
-   git clone https://github.com/yourusername/snake-game.git
+   git clone https://github.com/Biruk9/snake-game.git
    cd snake-game
 
 2. Compile using GCC (Windows):
